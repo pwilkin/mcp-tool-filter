@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "mcp-filter"
+version = "0.1.0"
+description = "An MCP tool filter and proxy."
+authors = ["Jules"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastmcp = "^2.10.5"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.0"
+pytest-asyncio = "^0.21.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

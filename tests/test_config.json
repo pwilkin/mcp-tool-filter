@@ -1,0 +1,52 @@
+{
+    "mcpServers": {
+        "server1": {
+            "command": "python",
+            "args": ["tests/mock_server_1.py"]
+        },
+        "server2": {
+            "command": "python",
+            "args": ["tests/mock_server_2.py"]
+        }
+    },
+    "proxyConfigs": {
+        "passthrough_filtered": {
+            "serverMappings": {
+                "server1": { "type": "passthrough" },
+                "server2": { "type": "passthrough" }
+            },
+            "filtering": {
+                "server1": ["tool_a"],
+                "server2": ["tool_d"]
+            }
+        },
+        "prefixed": {
+            "serverMappings": {
+                "server1": { "type": "prefix" },
+                "server2": { "type": "prefix" }
+            }
+        },
+        "explicit_rename": {
+            "serverMappings": {
+                "server1": {
+                    "type": "explicit",
+                    "map": {
+                        "tool_a": "renamed_tool_a"
+                    }
+                }
+            },
+            "filtering": {
+                "server1": ["tool_a"]
+            }
+        },
+        "mixed": {
+            "serverMappings": {
+                "server1": { "type": "prefix" },
+                "server2": { "type": "passthrough" }
+            },
+            "filtering": {
+                "server1": ["tool_b"]
+            }
+        }
+    }
+}
