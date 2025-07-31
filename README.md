@@ -8,7 +8,7 @@ This project provides a flexible and configurable MCP (Model-Context-Protocol) s
 - **Tool Filtering**: Restrict the list of available tools from each upstream server.
 - **Tool Naming**: Customize the names of proxied tools with different strategies:
     - `passthrough`: Use the original tool name.
-    - `prefix`: Add the server name as a prefix to the tool name.
+    - `prefix`: Add a prefix to the tool name. This defaults to the server name, but can be customized with a `prefix` field.
     - `explicit`: Rename tools using a specific mapping.
 - **Configuration via JSON**: All settings are managed through a simple JSON configuration file.
 
@@ -94,6 +94,15 @@ Each proxy configuration has two parts: `serverMappings` and `filtering`.
         "prefixed": {
             "serverMappings": {
                 "server1": { "type": "prefix" },
+                "server2": { "type": "prefix" }
+            }
+        },
+        "custom_prefix": {
+            "serverMappings": {
+                "server1": {
+                    "type": "prefix",
+                    "prefix": "my_prefix"
+                },
                 "server2": { "type": "prefix" }
             }
         }

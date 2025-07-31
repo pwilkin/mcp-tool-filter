@@ -47,6 +47,17 @@
             "filtering": {
                 "server1": ["tool_b"]
             }
+        },
+        "custom_prefix": {
+            "serverMappings": {
+                "server1": {
+                    "type": "prefix",
+                    "prefix": "custom1"
+                },
+                "server2": {
+                    "type": "prefix"
+                }
+            }
         }
     }
 }

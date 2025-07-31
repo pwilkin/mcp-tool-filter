@@ -8,7 +8,8 @@ from typing import Any, Dict, List
 from fastmcp import FastMCP
 from fastmcp.client import Client
 from fastmcp.client.transports import StdioTransport
-from fastmcp.tools.tool import FunctionTool
+from fastmcp.tools.tool import Tool
+from fastmcp.tools.tool_transform import TransformedTool
 
 
 class MCPProxy:
@@ -65,24 +66,35 @@ class MCPProxy:
     def _get_tool_name(self, original_name: str, server_name: str, mapping_info: Dict[str, Any]) -> str:
         mapping_type = mapping_info.get("type", "passthrough")
         if mapping_type == "prefix":
-            return f"{server_name}_{original_name}"
+            prefix = mapping_info.get("prefix", server_name)
+            return f"{prefix}_{original_name}"
         elif mapping_type == "explicit":
             return mapping_info.get("map", {}).get(original_name, original_name)
         else: # passthrough
             return original_name
 
-    def _create_wrapper_tool(self, client: Client, remote_tool, new_name: str) -> FunctionTool:
+    def _create_wrapper_tool(self, client: Client, remote_tool, new_name: str) -> TransformedTool:
         """Creates a local tool that calls the remote tool."""
 
-        async def tool_func(**kwargs):
+        # Manually create a fastmcp.tools.tool.Tool from the remote_tool
+        tool_for_transform = Tool(
+            name=remote_tool.name,
+            description=remote_tool.description,
+            parameters=remote_tool.inputSchema,
+            title=remote_tool.title if hasattr(remote_tool, 'title') else new_name,
+            tags=remote_tool.tags if hasattr(remote_tool, 'tags') else set(),
+            output_schema=remote_tool.outputSchema if hasattr(remote_tool, 'outputSchema') else None,
+            serializer=remote_tool.serializer if hasattr(remote_tool, 'serializer') else None,
+        )
+
+        async def transform_fn(**kwargs):
             return await client.call_tool(remote_tool.name, **kwargs)
 
-        # Preserve the original tool's signature and description
-        wrapper = FunctionTool(
+        wrapper = Tool.from_tool(
+            tool=tool_for_transform,
+            transform_fn=transform_fn,
             name=new_name,
             description=remote_tool.description,
-            fn=tool_func,
-            parameters=remote_tool.inputSchema,
         )
         return wrapper
 

@@ -53,7 +53,7 @@ async def get_proxy_client():
         procs.append(proc)
         await asyncio.sleep(2)  # Give server time to start
 
-        transport = StreamableHttpTransport(url=f"http://localhost:{PORT}")
+        transport = StreamableHttpTransport(url=f"http://localhost:{PORT}/mcp/")
         client = Client(transport)
         return client
 
@@ -118,4 +118,19 @@ async def test_mixed_config(get_proxy_client):
         assert result_b == "Hello, world"
 
         result_c = await client.call_tool("tool_c", z=True)
+        assert result_c is False
+
+@pytest.mark.asyncio
+async def test_custom_prefix(get_proxy_client):
+    client = await get_proxy_client("custom_prefix")
+    async with client:
+        tools = await client.get_tools()
+        tool_names = {t.name for t in tools}
+
+        assert tool_names == {"custom1_tool_a", "custom1_tool_b", "server2_tool_c", "server2_tool_d"}
+
+        result_a = await client.call_tool("custom1_tool_a", x=10)
+        assert result_a == 20
+
+        result_c = await client.call_tool("server2_tool_c", z=True)
         assert result_c is False
